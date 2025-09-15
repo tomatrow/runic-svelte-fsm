@@ -1,4 +1,11 @@
-# svelte-fsm changelog
+# runic-svelte-fsm changelog
+
+## 1.3.0
+
+- use runes
+- use sveltekit
+- use pnpm
+- type debounce a bit more
 
 ## 1.2.0
 
