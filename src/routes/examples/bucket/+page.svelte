@@ -20,7 +20,7 @@
 			}
 		},
 		notFull: {
-			add(amount) {
+			add(amount: number) {
 				level += amount
 				if (level === max) {
 					return "full"
@@ -30,7 +30,7 @@
 			}
 		},
 		full: {
-			add(amount) {
+			add(amount: number) {
 				level += amount
 				return "overflowing"
 			}
@@ -40,7 +40,7 @@
 				spillage = level - max
 				level = max
 			},
-			add(amount) {
+			add(amount: number) {
 				spillage += amount
 			}
 		}
