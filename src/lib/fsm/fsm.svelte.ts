@@ -1,4 +1,4 @@
-type States = Record<string | symbol, Record<string, string | Function>>
+type States = Record<string, Record<string, string | Function>>
 type InvocationProxy = Record<string, Function & { debounce: Function }> & { current: string }
 
 export function fsm(initialStatus: string, states: States = {}) {
@@ -27,8 +27,7 @@ export function fsm(initialStatus: string, states: States = {}) {
 
 	function invoke(event: string, ...args: unknown[]) {
 		const newStatus = dispatch(event, ...args)
-		if (["string", "symbol"].includes(typeof newStatus) && newStatus !== status)
-			transition(newStatus, event, args)
+		if (typeof newStatus === "string" && newStatus !== status) transition(newStatus, event, args)
 		return status
 	}
 
