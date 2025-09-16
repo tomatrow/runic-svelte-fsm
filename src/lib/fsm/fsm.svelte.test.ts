@@ -269,3 +269,46 @@ describe("FSM which uses async debounce", () => {
 		expect(onExitHandler).not.toHaveBeenCalled()
 	})
 })
+
+describe("fsm that references itself in _enter of initial state", () => {
+	it("should throw error", () => {
+		expect(() => {
+			let machine = fsm("initial", {
+				initial: {
+					_enter() {
+						machine.change()
+					},
+					change: "final"
+				},
+				final: {}
+			})
+		}).toThrowError(new ReferenceError("Cannot access 'machine' before initialization"))
+	})
+
+	it("should initialize without error", async () => {
+		let f: ReturnType<typeof createMachine>
+
+		function createMachine() {
+			let machine = fsm("initial", {
+				initial: {
+					_enter() {
+						queueMicrotask(() => machine.change())
+					},
+					change: "final"
+				},
+				final: {}
+			})
+
+			return machine
+		}
+
+		expect(() => {
+			f = createMachine()
+		}).not.toThrow()
+
+		await new Promise<void>((resolve) => resolve())
+
+		// @ts-expect-error we do initialize above
+		expect(f.current).toBe("final")
+	})
+})
