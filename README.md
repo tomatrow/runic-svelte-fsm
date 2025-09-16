@@ -2,6 +2,12 @@
 
 rune based version of [kenkunz/svelte-fsm](https://github.com/kenkunz/svelte-fsm) with the same api surface, but stricter typing
 
+## Installation
+
+```shell
+pnpm i -D runic-svelte-fsm
+```
+
 ## Notes
 
 - notable forks of the original lib

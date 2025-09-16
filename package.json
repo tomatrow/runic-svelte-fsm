@@ -1,7 +1,8 @@
 {
 	"name": "runic-svelte-fsm",
 	"version": "1.3.0",
-	"description": "Tiny (<1kb), expressive, Svelte-optimized Finite State Machine (FSM) library",
+	"description": "Tiny (<1kb), expressive, Runic-Svelte Finite State Machine (FSM) library",
+	"license": "MIT",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
@@ -52,7 +53,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/tomatrow/runic-svelte-fsm.git"
+		"url": "git+https://github.com/tomatrow/runic-svelte-fsm.git"
 	},
 	"keywords": [
 		"svelte",
