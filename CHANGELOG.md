@@ -1,5 +1,9 @@
 # runic-svelte-fsm changelog
 
+## 1.3.1
+
+- avoid symbols
+
 ## 1.3.0
 
 - use runes
