@@ -1,6 +1,6 @@
 # runic-svelte-fsm
 
-runae baed version of [kenkunz/svelte-fsm](https://github.com/kenkunz/svelte-fsm) with a little more typing
+rune based version of [kenkunz/svelte-fsm](https://github.com/kenkunz/svelte-fsm) with the same api surface, but stricter typing
 
 ## Notes
 
