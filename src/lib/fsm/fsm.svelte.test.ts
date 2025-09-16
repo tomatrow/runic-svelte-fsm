@@ -81,6 +81,7 @@ describe("FSM of a simple toggle switch", () => {
 
 	it("passes arguments array to _enter and _exit handlers", () => {
 		const args = [1, 2, 3]
+		// @ts-expect-error _enter and _exit are not strongly typed
 		f.toggle(...args)
 		expect(offEnterHandler).toHaveBeenCalledWith({ from: null, to: "off", event: null, args: [] })
 		expect(offExitHandler).toHaveBeenCalledWith({ from: "off", to: "on", event: "toggle", args })
@@ -90,6 +91,7 @@ describe("FSM of a simple toggle switch", () => {
 
 	it("passes a single argument to _enter and _exit handlers", () => {
 		const origin = { x: 0, y: 0 }
+		// @ts-expect-error _enter and _exit are not strongly typed
 		f.toggle(origin)
 		expect(offEnterHandler).toHaveBeenCalledWith({ from: null, to: "off", event: null, args: [] })
 		expect(offExitHandler).toHaveBeenCalledWith({

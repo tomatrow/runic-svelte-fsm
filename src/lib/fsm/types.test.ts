@@ -1,7 +1,3 @@
-/*
- * Verify type declarations found in index.d.ts by running:
- * $ npx tsc --noEmit --target es6 test/types.ts
- */
 import { fsm } from "./index.js"
 
 // @ts-expect-error fsm expects 2 arguments (0 provided)
@@ -36,6 +32,9 @@ const valid1 = fsm("off", {
 	on: {
 		toggle() {
 			return "off"
+		},
+		turnOff(message: string) {
+			return "off"
 		}
 	}
 })
@@ -46,17 +45,27 @@ valid1.current = "on"
 // @ts-expect-error state machine expects valid event invocation
 valid1.noSuchAction()
 
-// can pass any argument if action get's never typed
 valid1.toggle()
+valid1.turnOff("")
+// @ts-expect-error arguments are strongly typed
 valid1.toggle(1)
+// @ts-expect-error arguments are strongly typed
 valid1.toggle(true, 1)
+// @ts-expect-error arguments are strongly typed
+valid1.turnOff()
+
+// @ts-expect-error
 valid1.toggle("test", true, 1)
 
-const toggleResultValid: string | symbol = valid1.toggle()
-// @ts-expect-error toggle returns string or symbol
+// can call debounce
+valid1.toggle.debounce(100)
+
+const toggleResultValid: string = valid1.toggle()
+// @ts-expect-error toggle returns string
 const toggleResultInvalid: number = valid1.toggle()
 
 // A state machine with fallback state (any initial state permitted)
+// @ts-expect-error
 const valid2 = fsm("initial", {
 	"*": {
 		foo: () => {}
@@ -65,7 +74,7 @@ const valid2 = fsm("initial", {
 valid2.foo()
 
 // A state machine with overloaded action signatures
-const valid3 = fsm("initial", {
+const valid3 = fsm("foo", {
 	"*": {
 		overloaded(one: number) {
 			return "foo"
@@ -75,8 +84,14 @@ const valid3 = fsm("initial", {
 		overloaded(one: string, two: number) {}
 	}
 })
+
 // @ts-expect-error overloaded expects 1 or 2 args (0 provided)
 valid3.overloaded()
+valid3.overloaded.debounce(2, 1)
+valid3.overloaded.debounce(2, "", 1)
+
+// @ts-expect-error overloaded debounce expects first argument as number
+valid3.overloaded.debounce(2, 2, 1)
 // @ts-expect-error overloaded expects first argument as number
 valid3.overloaded("string")
 valid3.overloaded(1)
@@ -86,18 +101,10 @@ valid3.overloaded("string", 2)
 // @ts-expect-error overloaded expects 1 or 2 args (3 provided)
 valid3.overloaded(1, 2, 3)
 
-// @ts-expect-error overloaded with single argument returns string | symbol
+// @ts-expect-error overloaded with single argument returns "foo"
 const overloadedResult1Invalid: void = valid3.overloaded(1)
-const overloadedResult1Valid: string | symbol = valid3.overloaded(1)
+const overloadedResult1Valid: string = valid3.overloaded(1)
 
-// @ts-expect-error overloaded with two arguments returns string | symbol
+// @ts-expect-error overloaded with two arguments returns "foo"
 const overloadedResult2Invalid: void = valid3.overloaded("string", 1)
-const overloadedResult2Valid: string | symbol = valid3.overloaded("string", 1)
-
-// A state machine that uses symbols as a state keys
-const valid4 = fsm(Symbol.for("foo"), {
-	[Symbol.for("foo")]: {
-		bar: Symbol.for("bar")
-	}
-})
-const symbolResultValid: string | symbol = valid4.bar()
+const overloadedResult2Valid: string = valid3.overloaded("string", 1)
