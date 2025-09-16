@@ -20,7 +20,8 @@ export function fsm(initialStatus: string, states: States = {}) {
 
 	function dispatch(event: string, ...args: unknown[]) {
 		const action = states[status]?.[event] ?? states["*"]?.[event]
-		if (action === undefined) console.warn("No action defined for event", event, "in state", status)
+		if (action === undefined && event !== "_enter" && event !== "_exit")
+			console.warn("No action defined for event", event, "in state", status)
 		return action instanceof Function ? action.apply(proxy, args) : action
 	}
 
