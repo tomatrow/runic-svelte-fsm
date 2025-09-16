@@ -1,5 +1,5 @@
 type UnionToIntersection<U> =
-	(U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never
+	(U extends U ? (k: U) => void : never) extends (k: infer I) => void ? I : never
 
 type ExtractObjectValues<Object> = Object[keyof Object]
 
@@ -20,7 +20,7 @@ type MapActionsToInvokers<ActionMap, States> = {
 }
 
 type MapMethodsOverUnion<ActionMapUnion, States> =
-	ActionMapUnion extends any ? MapActionsToInvokers<ActionMapUnion, States> : never
+	ActionMapUnion extends ActionMapUnion ? MapActionsToInvokers<ActionMapUnion, States> : never
 
 export type StateMachine<States, EventMapByStates> = UnionToIntersection<
 	MapMethodsOverUnion<ExtractObjectValues<EventMapByStates>, States>
