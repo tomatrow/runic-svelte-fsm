@@ -1,5 +1,5 @@
-type InvocationProxy = Record<string, Function & { debounce: Function }> & { current: string }
 type States = Record<string | symbol, Record<string, string | Function>>
+type InvocationProxy = Record<string, Function & { debounce: Function }> & { current: string }
 
 export function fsm(initialStatus: string, states: States = {}) {
 	/*
@@ -73,9 +73,7 @@ export function fsm(initialStatus: string, states: States = {}) {
 		}
 	)
 
-	/*
-	 * `_enter` initial state and return the proxy object
-	 */
+	/** `_enter` initial state and return the proxy object */
 	dispatch("_enter", { from: null, to: initialStatus, event: null, args: [] })
 	return proxy
 }
