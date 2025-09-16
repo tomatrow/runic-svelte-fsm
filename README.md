@@ -6,5 +6,6 @@ rune based version of [kenkunz/svelte-fsm](https://github.com/kenkunz/svelte-fsm
 
 - notable forks of the original lib
   - [githubnext/tiny-svelte-fsm](https://github.com/githubnext/tiny-svelte-fsm)
-    - I grabbed their runtime tests, but kept the same api surface as the original lib
+    - I grabbed their runtime tests
   - [svecosystem/runed](https://github.com/svecosystem/runed)
+    - their FiniteStateMachine class specifically
