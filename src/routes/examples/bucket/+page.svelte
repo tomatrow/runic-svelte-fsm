@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { fsm, type LifecycleMeta } from "$lib/index.js"
+	import { fsm, type TransitionEvent } from "$lib/index.js"
 
-	let metas = $state<LifecycleMeta[]>([])
+	let events = $state<TransitionEvent[]>([])
 
 	const max = 10
 
@@ -15,8 +15,8 @@
 				spillage = 0
 				return "notFull"
 			},
-			_enter(meta) {
-				metas.push(meta)
+			_enter(event) {
+				events.push(event)
 			}
 		},
 		notFull: {
@@ -56,7 +56,7 @@
 <button onclick={() => bucket.empty()}>Empty</button>
 
 <ul>
-	{#each metas as meta}
-		<li>{JSON.stringify(meta)}</li>
+	{#each events as event}
+		<li>{JSON.stringify(event)}</li>
 	{/each}
 </ul>

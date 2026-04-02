@@ -54,7 +54,7 @@ describe("FSM of a simple toggle switch", () => {
 		expect(f.current).toBe("off")
 		expect(warnSpy).toHaveBeenCalledTimes(1)
 		expect(warnSpy).toHaveBeenCalledWith(
-			"No action defined for event",
+			"No handler defined for action",
 			"missing",
 			"in state",
 			"off"
@@ -83,9 +83,9 @@ describe("FSM of a simple toggle switch", () => {
 		const args = [1, 2, 3]
 		// @ts-expect-error _enter and _exit are not strongly typed
 		f.toggle(...args)
-		expect(offEnterHandler).toHaveBeenCalledWith({ from: null, to: "off", event: null, args: [] })
-		expect(offExitHandler).toHaveBeenCalledWith({ from: "off", to: "on", event: "toggle", args })
-		expect(onEnterHandler).toHaveBeenCalledWith({ from: "off", to: "on", event: "toggle", args })
+		expect(offEnterHandler).toHaveBeenCalledWith({ from: null, to: "off", action: null, args: [] })
+		expect(offExitHandler).toHaveBeenCalledWith({ from: "off", to: "on", action: "toggle", args })
+		expect(onEnterHandler).toHaveBeenCalledWith({ from: "off", to: "on", action: "toggle", args })
 		expect(onExitHandler).not.toHaveBeenCalled()
 	})
 
@@ -93,17 +93,17 @@ describe("FSM of a simple toggle switch", () => {
 		const origin = { x: 0, y: 0 }
 		// @ts-expect-error _enter and _exit are not strongly typed
 		f.toggle(origin)
-		expect(offEnterHandler).toHaveBeenCalledWith({ from: null, to: "off", event: null, args: [] })
+		expect(offEnterHandler).toHaveBeenCalledWith({ from: null, to: "off", action: null, args: [] })
 		expect(offExitHandler).toHaveBeenCalledWith({
 			from: "off",
 			to: "on",
-			event: "toggle",
+			action: "toggle",
 			args: [origin]
 		})
 		expect(onEnterHandler).toHaveBeenCalledWith({
 			from: "off",
 			to: "on",
-			event: "toggle",
+			action: "toggle",
 			args: [origin]
 		})
 		expect(onExitHandler).not.toHaveBeenCalled()

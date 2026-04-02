@@ -1,7 +1,7 @@
 type UnionToIntersection<U> =
 	(U extends U ? (k: U) => void : never) extends (k: infer I) => void ? I : never
 
-type ExtractObjectValues<Object> = Object[keyof Object]
+type HookKeys = "_enter" | "_exit"
 
 type MapActionToInvoker<Fn, States> =
 	Fn extends (...args: infer A) => infer _ ?
@@ -11,9 +11,7 @@ type MapActionToInvoker<Fn, States> =
 	:	never
 
 type MapActionsToInvokers<ActionMap, States> = {
-	[ActionKey in Exclude<keyof ActionMap, "_enter" | "_exit">]: ActionMap[ActionKey] extends (
-		Function
-	) ?
+	[ActionKey in Exclude<keyof ActionMap, HookKeys>]: ActionMap[ActionKey] extends Function ?
 		MapActionToInvoker<ActionMap[ActionKey], States>
 	: ActionMap[ActionKey] extends string ? MapActionToInvoker<() => States, States>
 	: never
@@ -22,31 +20,80 @@ type MapActionsToInvokers<ActionMap, States> = {
 type MapMethodsOverUnion<ActionMapUnion, States> =
 	ActionMapUnion extends ActionMapUnion ? MapActionsToInvokers<ActionMapUnion, States> : never
 
-export type StateMachine<States, EventMapByStates> = UnionToIntersection<
-	MapMethodsOverUnion<ExtractObjectValues<EventMapByStates>, States>
-> & { get current(): States }
-
-export type LifecycleMeta = {
-	from: string | null
-	to: string
-	event: string | null
-	args: unknown[]
+export type StateMachine<States, ActionMapByStates> = UnionToIntersection<
+	MapMethodsOverUnion<ActionMapByStates[keyof ActionMapByStates], States>
+> & {
+	/** The current active state of the state machine. */
+	get current(): States
+	/** For type checking capabilities only. Does not exist at runtime. DO NOT USE! */
+	readonly "~types": { states: States; actionMap: ActionMapByStates }
 }
 
-export type BaseEventMapByStates = Record<
+export type TransitionEvent<
+	From extends string | null = string | null,
+	To extends string = string,
+	Action extends string | null = string | null,
+	Args extends unknown[] = unknown[]
+> = { from: From; to: To; action: Action; args: Args }
+
+type BaseActionMapByStates = Record<
 	string,
 	Record<string, string | ((...args: any[]) => string | void)> & {
-		_enter?(meta: LifecycleMeta): void
-		_exit?(meta: LifecycleMeta): void
+		_enter?(event: TransitionEvent): void
+		_exit?(event: TransitionEvent): void
 	}
 >
 
-export type ExtractStates<EventMapByStates> = Exclude<string & keyof EventMapByStates, "*">
+type ExtractStates<ActionMapByStates> = Exclude<string & keyof ActionMapByStates, "*">
 
-export type FSM = <
-	EventMapByStates extends BaseEventMapByStates,
-	States extends ExtractStates<EventMapByStates>
->(
-	initialState: States,
-	eventMapByStates: EventMapByStates
-) => StateMachine<ExtractStates<EventMapByStates>, EventMapByStates>
+type ValidateAction<Action, States extends string> =
+	Action extends (...args: any[]) => any ? Action
+	: Action extends string ?
+		Action extends States ?
+			Action
+		:	States
+	:	Action
+
+type StrictActions<Actions, States extends string> = {
+	[K in keyof Actions]: K extends HookKeys ? Actions[K] : ValidateAction<Actions[K], States>
+}
+
+type StrictActionMapByStates<T extends BaseActionMapByStates> = {
+	[K in keyof T]: StrictActions<T[K], ExtractStates<T>>
+}
+
+export type FSM = <ActionMapByStates extends BaseActionMapByStates>(
+	initialState: ExtractStates<ActionMapByStates>,
+	actionMapByStates: ActionMapByStates & StrictActionMapByStates<ActionMapByStates>
+) => StateMachine<ExtractStates<ActionMapByStates>, ActionMapByStates>
+
+type ActionArgs<ActionValue> = ActionValue extends (...args: infer A) => any ? A : []
+
+type ActionTarget<ActionValue, States extends string> =
+	ActionValue extends States ? ActionValue
+	: ActionValue extends (...args: any[]) => infer R ?
+		[Extract<R, States>] extends [never] ?
+			[Extract<R, string>] extends [never] ?
+				never
+			:	States
+		:	Extract<R, States>
+	:	States
+
+type StateTransitions<From extends string, Config, States extends string> = {
+	[A in Exclude<keyof Config, HookKeys> & string]: [ActionTarget<Config[A], States>] extends (
+		[never]
+	) ?
+		never
+	:	TransitionEvent<From, ActionTarget<Config[A], States>, A, ActionArgs<Config[A]>>
+}[Exclude<keyof Config, HookKeys> & string]
+
+export type InferTransitions<M> =
+	M extends { "~types": { states: infer S extends string; actionMap: infer E } } ?
+		{
+			[K in S]:
+				| (K extends keyof E ? StateTransitions<K, E[K], S> : never)
+				| ("*" extends keyof E ? StateTransitions<K, E[Extract<"*", keyof E>], S> : never)
+		}[S]
+	:	never
+
+export type InferStates<M> = M extends { "~types": { states: infer S } } ? S : never

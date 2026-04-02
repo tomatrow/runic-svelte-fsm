@@ -1,33 +1,33 @@
 <script lang="ts">
-	import { fsm, type LifecycleMeta } from "$lib/index.js"
+	import { fsm, type TransitionEvent } from "$lib/index.js"
 
-	let metas = $state<LifecycleMeta[]>([])
+	let events = $state<TransitionEvent[]>([])
 
 	let machine = fsm("green", {
 		green: {
-			_enter(meta) {
+			_enter(event) {
 				// this is the edgiest of cases
 				// _enter is called on green right before machine in initialized
 				function change() {
 					machine.change.debounce(2000)
 				}
-				if (meta.from === null) queueMicrotask(change)
+				if (event.from === null) queueMicrotask(change)
 				else change()
-				metas.push(meta)
+				events.push(event)
 			},
 			change: "yellow"
 		},
 		yellow: {
-			_enter(meta) {
+			_enter(event) {
 				machine.change.debounce(500)
-				metas.push(meta)
+				events.push(event)
 			},
 			change: "red"
 		},
 		red: {
-			_enter(meta) {
+			_enter(event) {
 				machine.change.debounce(2000)
-				metas.push(meta)
+				events.push(event)
 			},
 			change: "green"
 		}
@@ -37,7 +37,7 @@
 <p>{machine.current}</p>
 
 <ul>
-	{#each metas as meta}
-		<li>{JSON.stringify(meta)}</li>
+	{#each events as event}
+		<li>{JSON.stringify(event)}</li>
 	{/each}
 </ul>
