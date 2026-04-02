@@ -1,5 +1,14 @@
 # runic-svelte-fsm changelog
 
+## 2.0.0
+
+- **[breaking]** rename `LifecycleMeta` type to `TransitionEvent`
+- **[breaking]** rename `event` property to `action` in lifecycle hook arguments (`_enter`, `_exit`)
+- **[breaking]** rename `BaseEventMapByStates` type to `BaseActionMapByStates`; "events" terminology replaced with "actions" throughout
+- **[feat]** add `InferTransitions` and `InferStates` type utilities for extracting transition/state types from a state machine
+- **[feat]** add `~types` branded property on `StateMachine` for type-level introspection
+- **[feat]** add strict compile-time validation of action return types
+
 ## 1.3.1
 
 - avoid symbols
